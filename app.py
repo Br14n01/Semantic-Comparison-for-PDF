@@ -1,24 +1,21 @@
 from flask import Flask, request, jsonify
 import os
 import tempfile
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from sentence_transformers import SentenceTransformer, util
 from pdf_utils import extract_text_from_pdf
 
 app = Flask(__name__)
 
-# Load fine-tuned model and tokenizer once at startup
-model_name = "./results"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
-model.eval()
+# Load Sentence Transformer model once at startup
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def semantic_similarity(text1, text2):
-    inputs = tokenizer(text1, text2, return_tensors="pt", truncation=True, padding=True, max_length=512)
-    with torch.no_grad():
-        outputs = model(**inputs)
-        score = torch.sigmoid(outputs.logits).item()  # Adjust if your model uses a different activation
-    return score
+    # Encode both texts to get their embeddings
+    embedding1 = model.encode(text1, convert_to_tensor=True)
+    embedding2 = model.encode(text2, convert_to_tensor=True)
+    # Compute cosine similarity between embeddings
+    cosine_score = util.pytorch_cos_sim(embedding1, embedding2)
+    return cosine_score.item()  # scalar similarity score between -1 and 1
 
 @app.route('/compare', methods=['POST'])
 def compare_pdfs():
@@ -47,7 +44,7 @@ def compare_pdfs():
         os.unlink(tmp1.name)
         os.unlink(tmp2.name)
 
-    # Compute semantic similarity
+    # Compute semantic similarity using Sentence Transformers
     similarity_score = semantic_similarity(text1, text2)
 
     return jsonify({"similarity_score": similarity_score})
@@ -71,7 +68,6 @@ def extract_text():
         os.unlink(tmp.name)
 
     return jsonify({"extracted_text": text})
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
