@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 import tempfile
 from sentence_transformers import SentenceTransformer, util
 from pdf_utils import extract_text_from_pdf
 
 app = Flask(__name__)
+CORS(app)
 
 # Load Sentence Transformer model once at startup
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -47,7 +49,7 @@ def compare_pdfs():
     # Compute semantic similarity using Sentence Transformers
     similarity_score = semantic_similarity(text1, text2)
 
-    return jsonify({"similarity_score": similarity_score})
+    return jsonify({"similarity_score": f"{similarity_score*100:.3f}%"})
 
 @app.route('/extract_text', methods=['POST'])
 def extract_text():
