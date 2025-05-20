@@ -1,0 +1,12 @@
+README.txt
+__pycache__/
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+results/
+testset/
+datasets/
+*.docx
