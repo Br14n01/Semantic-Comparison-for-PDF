@@ -1,9 +1,8 @@
-version: '3.8'
 
 services:
   frontend:
     build:
-      context: .
+      context: ./pdf-sts-ui
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -14,7 +13,7 @@ services:
 
   backend:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
