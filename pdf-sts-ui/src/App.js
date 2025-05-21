@@ -2,6 +2,9 @@ import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import "./App.css";
 
+// API base URL from environment variable
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 function App() {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
@@ -44,7 +47,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8080/extract_text", {
+      const response = await fetch(`${API_BASE_URL}/extract_text`, {
         method: "POST",
         body: formData,
       });
@@ -75,7 +78,7 @@ function App() {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/compare", {
+      const response = await fetch(`${API_BASE_URL}/compare`, {
         method: "POST",
         body: formData,
       });

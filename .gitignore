@@ -6,7 +6,6 @@ __pycache__/
 *.pyd
 *.egg-info/
 *.egg
-results/
 testset/
 datasets/
 *.docx
